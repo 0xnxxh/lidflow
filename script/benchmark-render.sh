@@ -9,7 +9,7 @@ python3 - "$TASK_TMP" <<'PY'
 import sys
 from pathlib import Path
 folder=Path(sys.argv[1])
-s=Path('Sources/LidFlow/Renderer.swift').read_text().replace('private func prepareBlur(', 'func prepareBlur(')
+s=Path('Sources/LidFlow/Renderer.swift').read_text()
 s=s.replace('let shaderURL = Bundle.module.url(forResource: "Shaders", withExtension: "metal")!', 'let shaderURL = URL(fileURLWithPath: CommandLine.arguments[1])')
 (folder/'Renderer.swift').write_text(s)
 PY

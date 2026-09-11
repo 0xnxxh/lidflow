@@ -1,3 +1,7 @@
+# 历史视觉研究（2026-09-10）
+
+> 本文保留开发前的调研与假设，不代表 v1.0.0 的实现或验收状态。当前使用说明见 [README](../../README.md)。原研究附件仅保留在本机 `research/assets/`，不随仓库分发。
+
 # Bendy / iPhone Duo 翻合盖效果复刻分析
 
 研究日期：2026-09-10。结论：可以实现视觉上高度接近 Bendy 的 macOS App。推荐 Swift + AppKit + ScreenCaptureKit + Metal；最先验证传感器事件与桌面覆盖闭环，再打磨特效。
@@ -12,7 +16,7 @@ Apple 官方页面描述了内外屏及不同姿态间的无缝过渡。其首�
 
 Bendy 将这种空间展开感转译到笔记本：底部铰链作为视觉支点，整张桌面向后倾斜，上部收窄、失焦、变暗；打开时反向恢复。复刻 Bendy 无需实现 iPhone 的双屏切换、应用布局重排或两块屏幕状态迁移。
 
-参考帧：[Apple 动画关键帧](assets/iphone-duo-frames.png)、[Bendy 演示关键帧](assets/bendy-frames.png)。
+参考帧：Apple 动画关键帧（本机研究附件：`research/assets/iphone-duo-frames.png`）、Bendy 演示关键帧（本机研究附件：`research/assets/bendy-frames.png`）。
 
 ## 2. 哪些是已确认事实
 
@@ -33,7 +37,7 @@ Bendy 将这种空间展开感转译到笔记本：底部铰链作为视觉支�
 
 ## 3. 网页演示给出的可复用视觉参数
 
-本地留存：[bendy.html](assets/bendy.html)。
+本地留存：bendy.html（本机研究附件：`research/assets/bendy.html`）。
 
 | 层 | 网页实现 |
 |---|---|
@@ -85,7 +89,7 @@ swift research/probe-lid.swift
 swift research/probe-lid-events.swift
 ```
 
-证据：[读取结果](assets/lid-probe.txt)、[静止事件监听](assets/lid-events.txt)。这些脚本不请求新权限，不改变传感器报告配置，不捕获或保存桌面。
+证据：读取结果（本机研究附件：`research/assets/lid-probe.txt`）、静止事件监听（本机研究附件：`research/assets/lid-events.txt`）。这些脚本不请求新权限，不改变传感器报告配置，不捕获或保存桌面。
 
 ### 4.2 捕获：整张内置屏，排除自身覆盖层
 

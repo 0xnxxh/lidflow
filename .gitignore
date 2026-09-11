@@ -3,3 +3,9 @@ dist/
 .DS_Store
 research/assets/
 artifacts/
+sparkle_private_key*
+*.p12
+*.p8
+*.pem
+.env
+.env.*

@@ -4,17 +4,25 @@ import MetalKit
 
 @main struct LidFlowApp: App {
     @StateObject private var model = AppModel()
+    @StateObject private var updater = AppUpdater()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         Window("LidFlow", id:"main") {
-            MainView(model:model)
+            MainView(model:model,updater:updater)
                 .onAppear { delegate.model=model; NSApp.setActivationPolicy(.regular); NSApp.activate(ignoringOtherApps:true) }
         }
         .defaultSize(width:900,height:770)
         .windowResizability(.contentSize)
-        .commands { CommandGroup(replacing:.newItem) {} }
-        MenuBarExtra("LidFlow", systemImage:"laptopcomputer") {
-            MenuContent(model:model)
+        .commands {
+            CommandGroup(replacing:.newItem) {}
+            CommandGroup(after:.appInfo) {
+                Button("检查更新…", action:updater.checkForUpdates).disabled(!updater.canCheckForUpdates)
+            }
+        }
+        MenuBarExtra {
+            MenuContent(model:model,updater:updater)
+        } label: {
+            Image(nsImage:BrandIcon.menuBar).accessibilityLabel("LidFlow")
         }
     }
 }
@@ -25,12 +33,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 struct MenuContent: View {
     @ObservedObject var model:AppModel
+    @ObservedObject var updater:AppUpdater
     @Environment(\.openWindow) var openWindow
     var body:some View {
         Text(model.angle.map { "盖子角度 \(Int($0))°" } ?? "传感器不可用")
         Text(model.status)
         Divider()
         Button("打开 LidFlow") { openWindow(id:"main"); NSApp.activate(ignoringOtherApps:true) }
+        Button("检查更新…", action:updater.checkForUpdates).disabled(!updater.canCheckForUpdates)
         Divider()
         Button("退出 LidFlow") { NSApp.terminate(nil) }.keyboardShortcut("q")
     }
@@ -54,13 +64,15 @@ struct MetalPreview:NSViewRepresentable {
 }
 struct MainView:View {
     @ObservedObject var model:AppModel
+    @ObservedObject var updater:AppUpdater
     @State private var tab=0
     private let accent=Color(red:0.39,green:0.76,blue:0.69)
     var body:some View {
         HStack(spacing:0) {
             VStack(alignment:.leading,spacing:8) {
                 HStack(spacing:10) {
-                    Image(systemName:"laptopcomputer").font(.title2).foregroundStyle(accent)
+                    Image(nsImage:BrandIcon.menuBar).resizable().aspectRatio(contentMode:.fit)
+                        .frame(width:28,height:25).foregroundStyle(accent)
                     Text("LidFlow").font(.title2.weight(.semibold))
                 }.padding(.bottom,28)
                 nav("外观",symbol:"circle.lefthalf.filled",index:0)
@@ -78,7 +90,7 @@ struct MainView:View {
                         Text(tab==0 ? "柔光、深影、冰雾或飞灰，随角度变幻。" : "连接铰链，设置何时恢复清晰桌面。").font(.callout).foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("本地预览版").font(.caption).padding(.horizontal,10).padding(.vertical,6).background(.white.opacity(0.06),in:Capsule())
+                    Text(AppUpdater.versionLabel).font(.caption).padding(.horizontal,10).padding(.vertical,6).background(.white.opacity(0.06),in:Capsule())
                 }
                 if tab==0 { appearance } else { behavior }
                 Spacer(minLength:0)
@@ -207,6 +219,11 @@ struct MainView:View {
                 }.padding(12)
             }
             Text("App 启动后自动跟随，关闭设置窗口仍会继续。睡眠或锁屏期间暂停，恢复后自动连接。Esc 可恢复本次画面，打开盖子后自动继续。").font(.caption).foregroundStyle(.secondary)
+            HStack {
+                Toggle("自动检查更新",isOn:$updater.automaticallyChecksForUpdates).toggleStyle(.switch).controlSize(.small)
+                Spacer()
+                Button("检查更新…",action:updater.checkForUpdates).disabled(!updater.canCheckForUpdates)
+            }
         }
     }
 }
