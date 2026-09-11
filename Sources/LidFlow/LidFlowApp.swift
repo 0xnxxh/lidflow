@@ -39,6 +39,14 @@ struct MenuContent: View {
         Text(model.angle.map { "盖子角度 \(Int($0))°" } ?? "传感器不可用")
         Text(model.status)
         Divider()
+        Picker("切换模式",selection:Binding(get:{model.style},set:{model.selectStyle($0)})) {
+            Text("Silk · 柔光").tag(0)
+            Text("Shade · 深影").tag(1)
+            Text("Frost · 冰雾").tag(2)
+            Text("Ash · 飞灰").tag(3)
+        }
+        .pickerStyle(.inline)
+        Divider()
         Button("打开 LidFlow") { openWindow(id:"main"); NSApp.activate(ignoringOtherApps:true) }
         Button("检查更新…", action:updater.checkForUpdates).disabled(!updater.canCheckForUpdates)
         Divider()
